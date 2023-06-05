@@ -30,11 +30,11 @@ export const CartProvider = ({ children }: any) => {
   const [cartItems, setCartItems] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
-  const addItemToCart = (productToAdd) => {
+  const addItemToCart = (productToAdd: any) => {
     setCartItems(addCartItem(cartItems, productToAdd));
   };
 
-  const value: any = { products, setProducts, showDropdown, setShowDropdown };
+  const value: any = { cartItems, addItemToCart, showDropdown, setShowDropdown };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };
