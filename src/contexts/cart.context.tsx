@@ -1,21 +1,40 @@
 import { createContext, useState, useEffect } from "react";
 
+const addCartItem = (cartItems: any, productToAdd: any) => {
+  // Find if cartItems contains productToAdd
+  const existingCartItem = cartItems.find((cartItem: { id: any }) => {
+    cartItem.id === productToAdd.id;
+  });
+
+  // If found, increment quantity
+  if (existingCartItem) {
+    return cartItems.map((cartItem: { id: any; quantity: number; }) => {
+      cartItem.id === productToAdd.id
+        ? { ...cartItem, quantity: cartItem.quantity + 1 }
+        : cartItem;
+    });
+  }
+
+  // Return new array with modified cartItems/ new cart item
+  return [cartItems, { ...productToAdd, quantity: 1 }];
+};
+
 export const CartContext = createContext({
-  products: [],
-  setProducts: () => {},
+  cartItems: [],
+  addItemToCart: () => {},
   showDropdown: false,
-  setShowDropdown: () => {}
+  setShowDropdown: () => {},
 });
 
-export const CartProvider = ({ children }) => {
-  const [ products, setProducts ] = useState([]);
-  const [ showDropdown, setShowDropdown ] = useState(false);
+export const CartProvider = ({ children }: any) => {
+  const [cartItems, setCartItems] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
 
-  const value = { products, setProducts, showDropdown, setShowDropdown };
+  const addItemToCart = (productToAdd) => {
+    setCartItems(addCartItem(cartItems, productToAdd));
+  };
 
-  return (
-    <CartContext.Provider value={value}>
-      {children}
-    </CartContext.Provider>
-  )
+  const value: any = { products, setProducts, showDropdown, setShowDropdown };
+
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };
