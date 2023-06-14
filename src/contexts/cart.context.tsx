@@ -2,21 +2,21 @@ import { createContext, useState, useEffect } from "react";
 
 const addCartItem = (cartItems: any, productToAdd: any) => {
   // Find if cartItems contains productToAdd
-  const existingCartItem = cartItems.find((cartItem: { id: any }) => {
-    cartItem.id === productToAdd.id;
-  });
+  const existingCartItem = cartItems.find((cartItem: { id: number }) =>
+    cartItem.id === productToAdd.id
+  );
 
   // If found, increment quantity
   if (existingCartItem) {
-    return cartItems.map((cartItem: { id: any; quantity: number; }) => {
+    return cartItems.map((cartItem: { id: number; quantity: number; }) =>
       cartItem.id === productToAdd.id
         ? { ...cartItem, quantity: cartItem.quantity + 1 }
-        : cartItem;
-    });
+        : cartItem
+    );
   }
 
   // Return new array with modified cartItems/ new cart item
-  return [cartItems, { ...productToAdd, quantity: 1 }];
+  return [...cartItems, { ...productToAdd, quantity: 1 }];
 };
 
 export const CartContext = createContext({
