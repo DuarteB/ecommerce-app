@@ -1,7 +1,7 @@
-import CategoriesMenu from "../../components/categories-menu/categories-menu.component";
+import Directory from "../../components/directory/directory.component";
 
 const Home = () => {
-  return <CategoriesMenu />;
+  return <Directory />;
 };
 
 export default Home;
