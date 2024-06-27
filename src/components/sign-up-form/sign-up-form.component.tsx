@@ -10,7 +10,7 @@ import {
 } from "../../utils/firebase/firebase.utils";
 
 
-import './sign-up-form.styles.scss';
+import { SignUpContainer } from './sign-up-form.styles';
 import { UserContext } from "../../contexts/user.contex";
 
 interface IDefaultFormFields {
@@ -82,7 +82,7 @@ const SignUpForm = () => {
   }
 
   return (
-    <div className="sign-up-container">
+    <SignUpContainer>
       <h2>Don't have an account</h2>
       <span>Sign Up With Email and Password</span>
       <form onSubmit={handleSubmit}>
@@ -126,7 +126,7 @@ const SignUpForm = () => {
         />
         <Button type={'submit'} disabled={mustBeDisabled()}>Sign Up</Button>
       </form>
-    </div>
+    </SignUpContainer>
   )
 };
 

@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router-dom";
+
 import { BackgroundImage, Body, DirectoryItemContainer } from "./directory-item-styles";
 
 interface IProps {
@@ -5,13 +7,18 @@ interface IProps {
     id: number;
     title: string;
     imageUrl: string;
+    route: string;
   };
 }
 
 const DirectoryItem = ({ category }: IProps) => {
-  const { id, title, imageUrl } = category;
+  const { id, title, imageUrl, route } = category;
+  const navigate = useNavigate();
+
+  const onNavigateHandler = () => navigate(route);
+
   return (
-    <DirectoryItemContainer key={id}>
+    <DirectoryItemContainer key={id} onClick={onNavigateHandler}>
       <BackgroundImage
         imageUrl={imageUrl}
       />

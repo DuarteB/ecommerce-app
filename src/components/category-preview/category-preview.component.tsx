@@ -5,9 +5,10 @@ import ProductCard from '../product-card/product-card.component';
 import { CategoryPreviewContainer, Preview, CategoryTitle } from './category-preview.styles';
 
 const CategoryPreview = ({ title, products }) => {
+  console.log(title.toLowerCase());
   return (
     <CategoryPreviewContainer>
-      <CategoryTitle as={'h2'} to={`${title.toLowerCase()}`} className='title'>{title.toUpperCase()}</CategoryTitle>
+      <CategoryTitle to={`/shop/${title.toLowerCase()}`}>{title.toUpperCase()}</CategoryTitle>
       <Preview>
         {
           products
