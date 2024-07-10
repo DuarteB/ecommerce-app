@@ -1,4 +1,41 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useReducer } from "react";
+
+import { createAction } from "../utils/reducer/reducer.utils";
+
+export const CartContext = createContext({
+  cartItems: [],
+  addItemToCart: () => {},
+  showDropdown: false,
+  setShowDropdown: () => {},
+  removeItemFromCart: () => {},
+  clearItemFromCart: () => {},
+  total: 0,
+  cartCount: 0,
+});
+
+export const CART_ACTIONS_TYPE = {
+  SET_CART_ITEMS: "SET_CART_ITEMS",
+  SET_SHOW_DROPDOWN: "SET_SHOW_DROPDOWN",
+};
+
+const cartReducer = (state, action) => {
+  const { type, payload } = action;
+
+  switch (type) {
+    case CART_ACTIONS_TYPE.SET_CART_ITEMS:
+      return {
+        ...state,
+        ...payload,
+      };
+    case CART_ACTIONS_TYPE.SET_SHOW_DROPDOWN:
+      return {
+        ...state,
+        showDropdown: payload,
+      };
+    default:
+      throw new Error(`Unhandled type of ${type} in cartReducer`);
+  }
+};
 
 const addCartItem = (cartItems: any, productToAdd: any) => {
   // Find if cartItems contains productToAdd
@@ -25,8 +62,6 @@ const removeCartItem = (cartItems, cartItemToRemove) => {
     (cartItem) => cartItem.id === cartItemToRemove.id
   );
 
-  console.log(existingCartItem);
-
   //Check if quantity is equal to 1, if it is remove that item from the cart;
   if (existingCartItem && existingCartItem.quantity === 1) {
     return cartItems.filter((cartItem) => cartItem.id !== cartItemToRemove.id);
@@ -43,51 +78,57 @@ const removeCartItem = (cartItems, cartItemToRemove) => {
 const clearCartItem = (cartItems, cartItemToClear) =>
   cartItems.filter((cartItem) => cartItem.id !== cartItemToClear.id);
 
-export const CartContext = createContext({
+const INITIAL_STATE = {
   cartItems: [],
-  addItemToCart: () => {},
   showDropdown: false,
-  setShowDropdown: () => {},
-  removeItemFromCart: () => {},
-  clearItemFromCart: () => {},
-  total: 0,
   cartCount: 0,
-});
+  cartTotal: 0,
+};
 
 export const CartProvider = ({ children }: any) => {
-  const [cartItems, setCartItems] = useState([]);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
-  const [total, setTotal] = useState(0);
+  const [state, dispatch] = useReducer(cartReducer, INITIAL_STATE);
 
-  useEffect(() => {
-    const newCartTotal = cartItems.reduce(
-      (total, cartItem) => cartItem.price * cartItem.quantity + total,
+  const { cartItems, showDropdown, cartCount, cartTotal } = state;
+
+  const updateCartItemsReducer = (newCartItems: any[]) => {
+    const newCartCount = newCartItems.reduce(
+      (total: number, cartItem: { quantity: number }) =>
+        total + cartItem.quantity,
       0
     );
 
-    setTotal(newCartTotal);
-  }, [cartItems]);
-
-  useEffect(() => {
-    const newCartCount = cartItems.reduce(
-      (total, cartItem: { quantity: number }) => total + cartItem.quantity,
+    const newCartTotal = newCartItems.reduce(
+      (total: number, cartItem: { price: number; quantity: number }) =>
+        cartItem.price * cartItem.quantity + total,
       0
     );
 
-    setCartCount(newCartCount);
-  }, [cartItems]);
+    dispatch(
+      createAction(CART_ACTIONS_TYPE.SET_CART_ITEMS, {
+        cartItems: newCartItems,
+        cartTotal: newCartTotal,
+        cartCount: newCartCount,
+      })
+    );
+  };
 
   const addItemToCart = (productToAdd: any) => {
-    setCartItems(addCartItem(cartItems, productToAdd));
+    const newCartItems = addCartItem(cartItems, productToAdd);
+    updateCartItemsReducer(newCartItems);
   };
 
   const removeItemFromCart = (cartItemToRemove: any) => {
-    setCartItems(removeCartItem(cartItems, cartItemToRemove));
+    const newCartItems = removeCartItem(cartItems, cartItemToRemove);
+    updateCartItemsReducer(newCartItems);
   };
 
   const clearItemFromCart = (cartItemToClear: any) => {
-    setCartItems(clearCartItem(cartItems, cartItemToClear));
+    const newCartItems = clearCartItem(cartItems, cartItemToClear);
+    updateCartItemsReducer(newCartItems);
+  };
+
+  const setShowDropdown = () => {
+    dispatch(createAction(CART_ACTIONS_TYPE.SET_SHOW_DROPDOWN, !showDropdown));
   };
 
   const value: any = {
@@ -98,7 +139,7 @@ export const CartProvider = ({ children }: any) => {
     removeItemFromCart,
     clearItemFromCart,
     cartCount,
-    total,
+    cartTotal,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
